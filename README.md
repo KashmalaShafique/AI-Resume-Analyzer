@@ -336,71 +336,49 @@ The system calculates:
 
 ## 🔐 Login
 
-> Add screenshot here
-
-```
-images/login.png
-```
+![Login](screenshots/login.png)
 
 ---
 
 ## 📝 Register
 
-> Add screenshot here
-
-```
-images/register.png
-```
+![Register](screenshots/register.png)
 
 ---
 
 ## 📊 Dashboard
 
-> Add screenshot here
-
-```
-images/dashboard.png
-```
+![Dashboard](screenshots/Dashboard.png)
 
 ---
 
-## 📄 Resume Upload
+## 📄 Upload Resume
 
-> Add screenshot here
-
-```
-images/upload.png
-```
+![Upload Resume](screenshots/Upload_resume.png)
 
 ---
 
-## 📑 Resume Details
+## 📂 My Resumes
 
-> Add screenshot here
-
-```
-images/resume.png
-```
+![My Resumes](screenshots/my_resume.png)
 
 ---
 
 ## 💼 Job Management
 
-> Add screenshot here
-
-```
-images/jobs.png
-```
+![Job Management](screenshots/job_management.png)
 
 ---
 
-## 🎯 AI Matching Results
+## 🎯 AI Matching
 
-> Add screenshot here
+![AI Matching](screenshots/ai_matching.png)
 
-```
-images/matching.png
-```
+---
+
+## 📚 Swagger API
+
+![Swagger API](screenshots/swagger_api.png)
 
 ---
 
