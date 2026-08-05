@@ -348,19 +348,19 @@ The system calculates:
 
 ## 📊 Dashboard
 
-![Dashboard](screenshots/Dashboard.png)
+![Dashboard](screenshots/dashboard.png)
 
 ---
 
 ## 📄 Upload Resume
 
-![Upload Resume](screenshots/Upload_resume.png)
+![Upload Resume](screenshots/upload_resume.png)
 
 ---
 
 ## 📂 My Resumes
 
-![My Resumes](screenshots/my_resume.png)
+![My Resumes](screenshots/my_resumes.png)
 
 ---
 
