@@ -1,0 +1,11 @@
+# Database Configuration
+DATABASE_URL=postgresql://postgres:1234@localhost:5432/resume_analyzer
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+# Security Configuration
+SECRET_KEY=your_secret_key_here
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=8000
