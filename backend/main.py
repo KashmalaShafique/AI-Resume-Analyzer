@@ -20,6 +20,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://ai-resume-analyzer-mala1.vercel.app",
+        "https://ai-resume-analyzer-brown-theta-96.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
