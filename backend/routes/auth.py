@@ -95,12 +95,12 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
     except HTTPException:
         raise
 
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Registration database error: {str(e)}"
-        )
+    except Exception:
+    db.rollback()
+    raise HTTPException(
+        status_code=500,
+        detail="Registration failed. Please try again later."
+    )
     
     # Create new user
     hashed_password = get_password_hash(user.password)
