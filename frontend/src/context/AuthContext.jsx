@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
-axios.defaults.baseURL = 'https://ai-resume-analyzer-backend-three.vercel.app'
+axios.defaults.baseURL = 'https://ai-resume-analyzer-backend-mala1.vercel.app'
+
 
 const AuthContext = createContext()
 
