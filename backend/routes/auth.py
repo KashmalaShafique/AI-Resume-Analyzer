@@ -57,14 +57,49 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 @router.post("/register", response_model=User)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if user already exists
-    existing_user = db.query(UserModel).filter(
-        (UserModel.email == user.email) | (UserModel.username == user.username)
-    ).first()
-    if existing_user:
+    try:
+        # Check if user already exists
+        existing_user = db.query(UserModel).filter(
+            (UserModel.email == user.email) |
+            (UserModel.username == user.username)
+        ).first()
+
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="Email or username already registered"
+            )
+
+        # Create new user
+        hashed_password = get_password_hash(user.password)
+
+        db_user = UserModel(
+            email=user.email,
+            username=user.username,
+            hashed_password=hashed_password,
+            is_active=True
+        )
+
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return {
+            "id": str(db_user.id),
+            "email": db_user.email,
+            "username": db_user.username,
+            "is_active": db_user.is_active,
+            "created_at": db_user.created_at
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        db.rollback()
         raise HTTPException(
-            status_code=400,
-            detail="Email or username already registered"
+            status_code=500,
+            detail=f"Registration database error: {str(e)}"
         )
     
     # Create new user
