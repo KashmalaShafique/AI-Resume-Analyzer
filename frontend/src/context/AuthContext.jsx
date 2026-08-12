@@ -3,11 +3,16 @@ import axios from 'axios'
 
 const AuthContext = createContext()
 
+// Your deployed FastAPI backend
+const API_URL = 'https://ai-resume-analyzer-backend-mala1.vercel.app'
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
+
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
+
   return context
 }
 
@@ -16,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(localStorage.getItem('token'))
 
-  // Set up axios defaults
+  // Set Authorization header whenever token changes
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
@@ -25,12 +30,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token])
 
-  // Check if user is logged in on app start
+  // Check if user is already logged in
   useEffect(() => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const response = await axios.get('/api/auth/me')
+          const response = await axios.get(`${API_URL}/api/auth/me`)
           setUser(response.data)
         } catch (error) {
           console.error('Auth check failed:', error)
@@ -38,64 +43,92 @@ export const AuthProvider = ({ children }) => {
           setToken(null)
         }
       }
+
       setLoading(false)
     }
 
     checkAuth()
   }, [token])
 
+  // LOGIN
   const login = async (username, password) => {
     try {
-      const formData = new FormData()
+      // FastAPI OAuth2PasswordRequestForm expects
+      // application/x-www-form-urlencoded
+      const formData = new URLSearchParams()
+
       formData.append('username', username)
       formData.append('password', password)
 
-      const response = await axios.post('/api/auth/login', formData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
+      const response = await axios.post(
+        `${API_URL}/api/auth/login`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      )
 
       const { access_token } = response.data
+
       setToken(access_token)
       localStorage.setItem('token', access_token)
-      
-      // Get user info
-      const userResponse = await axios.get('/api/auth/me')
+
+      // Set token immediately for this request
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+      // Get user information
+      const userResponse = await axios.get(`${API_URL}/api/auth/me`)
+
       setUser(userResponse.data)
-      
+
       return { success: true }
+
     } catch (error) {
       console.error('Login failed:', error)
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
+
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Login failed'
       }
     }
   }
 
+  // REGISTER
   const register = async (username, email, password) => {
     try {
-      const response = await axios.post('/api/auth/register', {
-        username,
-        email,
-        password,
-      })
+      const response = await axios.post(
+        `${API_URL}/api/auth/register`,
+        {
+          username,
+          email,
+          password,
+        }
+      )
 
-      return { success: true, data: response.data }
+      return {
+        success: true,
+        data: response.data
+      }
+
     } catch (error) {
       console.error('Registration failed:', error)
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Registration failed' 
+
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Registration failed'
       }
     }
   }
 
+  // LOGOUT
   const logout = () => {
     setUser(null)
     setToken(null)
+
     localStorage.removeItem('token')
+
     delete axios.defaults.headers.common['Authorization']
   }
 
