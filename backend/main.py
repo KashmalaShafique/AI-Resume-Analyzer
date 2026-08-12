@@ -23,11 +23,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create uploads directory if it doesn't exist
-os.makedirs("uploads", exist_ok=True)
+# Create uploads directory
+UPLOAD_DIR = "/tmp/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Mount static files for uploaded resumes
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Create database tables on startup
 from models.database import create_tables
