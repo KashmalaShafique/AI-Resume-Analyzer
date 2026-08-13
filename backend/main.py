@@ -18,15 +18,18 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://ai-resume-analyzer-brown-theta-96.vercel.app",  # <-- your ACTUAL live frontend
         "https://ai-resume-analyzer-hanunfwxd-mala1.vercel.app",
         "https://ai-resume-analyzer-mala1.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
     ],
+    allow_origin_regex=r"https://ai-resume-analyzer.*\.vercel\.app",  # catches future preview URLs too
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # Create uploads directory
 UPLOAD_DIR = "/tmp/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
