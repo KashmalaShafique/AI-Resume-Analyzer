@@ -15,6 +15,10 @@ router = APIRouter()
 # Initialize resume parser
 resume_parser = ResumeParser()
 
+# Match the /tmp/uploads directory defined in main.py (Vercel only allows writes to /tmp)
+UPLOAD_DIR = "/tmp/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 @router.post("/upload", response_model=Resume)
 async def upload_resume(
     file: UploadFile = File(...),
@@ -34,7 +38,7 @@ async def upload_resume(
     # Generate unique filename
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     filename = f"{timestamp}_{file.filename}"
-    file_path = os.path.join("uploads", filename)
+    file_path = os.path.join(UPLOAD_DIR, filename)
     
     # Save file
     try:
@@ -73,7 +77,6 @@ async def upload_resume(
 async def get_resumes(current_user: UserModel = Depends(get_current_user), db: Session = Depends(get_db)):
     resumes = db.query(ResumeModel).filter(ResumeModel.user_id == current_user.id).all()
     
-    # Debug: Print what we're sending to frontend
     print(f"📤 Sending {len(resumes)} resumes to frontend:")
     for resume in resumes:
         print(f"   Resume {resume.id}: Status={resume.status}, Name={resume.parsed_name}, Email={resume.parsed_email}, Skills={len(resume.parsed_skills) if resume.parsed_skills else 0}")
@@ -88,7 +91,6 @@ async def get_resumes(current_user: UserModel = Depends(get_current_user), db: S
             "user_id": str(resume.user_id),
             "uploaded_at": resume.uploaded_at,
             "status": resume.status,
-            # Add parsed data fields
             "parsed_name": resume.parsed_name,
             "parsed_email": resume.parsed_email,
             "parsed_phone": resume.parsed_phone,
@@ -130,15 +132,12 @@ async def parse_resume(resume_id: int, current_user: UserModel = Depends(get_cur
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
     
-    # Update status to parsing
     resume.status = "parsing"
     db.commit()
     
     try:
-        # Parse resume using AI
         parsed_data = await resume_parser.parse_resume(resume.file_path)
         
-        # Update resume with parsed data
         resume.parsed_name = parsed_data.name
         resume.parsed_email = parsed_data.email
         resume.parsed_phone = parsed_data.phone
@@ -153,7 +152,6 @@ async def parse_resume(resume_id: int, current_user: UserModel = Depends(get_cur
         return {"message": "Resume parsed successfully", "parsed_data": parsed_data.dict()}
     
     except Exception as e:
-        # Update status to error
         resume.status = "error"
         db.commit()
         raise HTTPException(status_code=500, detail=f"Error parsing resume: {str(e)}")
@@ -167,14 +165,12 @@ async def delete_resume(resume_id: int, current_user: UserModel = Depends(get_cu
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
     
-    # Delete file from filesystem
     try:
         if os.path.exists(resume.file_path):
             os.remove(resume.file_path)
     except Exception as e:
         print(f"Error deleting file: {str(e)}")
     
-    # Delete from database
     db.delete(resume)
     db.commit()
     
