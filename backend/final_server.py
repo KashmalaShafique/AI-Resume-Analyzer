@@ -19,12 +19,16 @@ app = FastAPI(title="AI Resume Analyzer", version="1.0.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://ai-resume-analyzer-hanunfwxd-mala1.vercel.app",
+        "https://ai-resume-analyzer-mala1.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Import and setup everything
 try:
     print("🔄 Initializing database...")
